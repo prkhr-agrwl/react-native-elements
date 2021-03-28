@@ -117,6 +117,7 @@ const Slider: VFC<
   ).current;
 
   const isVertical = useRef(props.orientation === 'vertical').current;
+  const _previousLeft = useRef(0).current;
 
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [trackSize, setTrackSize] = useState({ width: 0, height: 0 });
@@ -169,8 +170,7 @@ const Slider: VFC<
   };
 
   const handlePanResponderGrant = () => {
-    getThumbLeft(getCurrentValue());
-    // _previousLeft = getThumbLeft(getCurrentValue());
+    _previousLeft = getThumbLeft(getCurrentValue());
     fireChangeEvent('onSlidingStart');
   };
 
@@ -272,20 +272,16 @@ const Slider: VFC<
     const width = isVertical ? layoutHeight : layoutWidth;
     const height = isVertical ? layoutWidth : layoutHeight;
     const size = { width, height };
-    const storeName = `_${name}`;
-    const currentSize = this[storeName];
-    if (
-      currentSize &&
-      width === currentSize.width &&
-      height === currentSize.height
-    ) {
-      return;
+    if (name === 'containerSize') {
+      setContainerSize(size);
     }
-    this[storeName] = size;
-    if (containerSize && trackSize && thumbSize) {
-      setContainerSize(containerSize);
-      setTrackSize(trackSize);
-      setThumbSize(thumbSize);
+    if (name === 'thumbSize') {
+      setThumbSize(size);
+    }
+    if (name === 'trackSize') {
+      setTrackSize(size);
+    }
+    if (thumbSize && trackSize && containerSize) {
       setAllMeasured(true);
     }
   };
@@ -303,8 +299,8 @@ const Slider: VFC<
   };
 
   const getValue = (gestureState) => {
-    const location = isVertical ? gestureState.dy : gestureState.dx;
-    // _previousLeft + (isVertical ? gestureState.dy : gestureState.dx);
+    const location =
+      _previousLeft + (isVertical ? gestureState.dy : gestureState.dx);
     return getValueForTouch(location);
   };
 
