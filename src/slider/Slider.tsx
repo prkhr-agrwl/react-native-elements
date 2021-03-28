@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useState, useRef } from 'react';
+import React, { VFC, useEffect, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,9 +9,9 @@ import {
   Platform,
   ViewStyle,
   StyleProp,
+  // PanResponderInstance,
 } from 'react-native';
-import { RneFunctionComponent } from '../helpers';
-import { withTheme } from '../config';
+import { ThemeProps, withTheme } from '../config';
 
 const TRACK_SIZE = 4;
 const THUMB_SIZE = 40;
@@ -92,8 +92,6 @@ export type SliderProps = {
   containerStyle?: StyleProp<ViewStyle>;
 };
 
-interface Slider extends RneFunctionComponent<SliderProps> {}
-
 type SliderState = {
   containerSize: Sizable;
   trackSize: Sizable;
@@ -102,7 +100,10 @@ type SliderState = {
   value: Animated.Value;
 };
 
-const Slider: Slider = (props) => {
+const Slider: VFC<
+  SliderProps & Partial<ThemeProps<SliderProps>>,
+  SliderState
+> = (props) => {
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: handleStartShouldSetPanResponder,
